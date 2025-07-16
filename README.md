@@ -26,6 +26,4 @@ Bot Telegram untuk mendigitalisasi proses input dan pelaporan kunjungan sales, d
 | [Pymongo](https://pymongo.readthedocs.io/)         | Alternatif driver MongoDB                                                  
 | [MongoDB](https://www.mongodb.com/)                | Database NoSQL untuk menyimpan data kunjungan                              
 | [GridFS / Local Storage](https://www.mongodb.com/docs/manual/core/gridfs/) | Penyimpanan file foto eviden                         
-| [Docker](https://www.docker.com/) *(optional)*     | Containerization untuk kemudahan deploy dan portability                    
-
 ---
