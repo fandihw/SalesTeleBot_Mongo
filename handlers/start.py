@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from services import is_user_allowed
+from services.mongodb import is_user_allowed
 
 WELCOME = (
     "👋 Selamat datang di *Sales Visit Bot*.\n\n"
@@ -31,3 +31,4 @@ async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(HELP, parse_mode="Markdown")
+
