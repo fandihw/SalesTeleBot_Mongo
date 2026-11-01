@@ -15,7 +15,6 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❗ Silakan kirim foto sebagai eviden kunjungan.")
         return
 
-    # Ambil file foto resolusi tertinggi
     photo_file = await update.message.photo[-1].get_file()
 
     # Simpan foto secara lokal sementara
