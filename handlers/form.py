@@ -169,7 +169,7 @@ async def ask_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
     step = context.user_data.get("step")
     kategori = context.user_data.get("kategori")
     
-    # 🔒 Skip "hasil_fu" jika kategori bukan Follow Up
+    # Skip "hasil_fu" jika kategori bukan Follow Up
     if step == "hasil_fu" and kategori != "Follow Up":
         next_idx = STEPS.index(step) + 1
         if next_idx < len(STEPS):
@@ -191,7 +191,7 @@ async def ask_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def save_data_to_mongo(data: dict) -> str:
     loop = asyncio.get_running_loop()
 
-    # ✅ Gunakan case-insensitive query dengan regex
+    # Gunakan case-insensitive query dengan regex
     query = {
         "user_id": data.get("user_id"),
         "telda": data.get("telda"),
@@ -202,13 +202,11 @@ async def save_data_to_mongo(data: dict) -> str:
     existing_visits = await loop.run_in_executor(None, lambda: list(collection.find(query)))
     visit_ke = len(existing_visits) + 1
 
-    # ✅ Buat data bersih tanpa field internal
     clean_data = {}
     for field in STEPS:
         if field in data:
             clean_data[field] = data[field]
     
-    # ✅ Tambahkan field sistem yang diperlukan
     clean_data.update({
         "visit_ke": visit_ke,
         "timestamp": datetime.now(WIB),
@@ -228,13 +226,11 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_path = f"photos/{user_id}_{photo_file.file_unique_id}.jpg"
     await photo_file.download_to_drive(file_path)
 
-    # ✅ Hanya ambil field yang diperlukan untuk database (tanpa 'step')
     form_data = {}
     for field in STEPS:
         if field in context.user_data:
             form_data[field] = context.user_data[field]
     
-    # ✅ Tambahkan field tambahan yang diperlukan
     form_data.update({
         "photo_url": file_path,
         "user_id": user_id
@@ -243,7 +239,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["form_data"] = form_data
     await show_confirmation(update, context)
 
-# ────────────── Konfirmasi dan Simpan ──────────────
+# Konfirmasi dan Simpan 
 async def handle_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -261,7 +257,7 @@ async def handle_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE
         context.user_data.clear()
         await query.edit_message_text("❌ Input dibatalkan. Silakan mulai ulang dengan /start", parse_mode=ParseMode.MARKDOWN_V2)
 
-# ────────────── Konfirmasi Visual ──────────────
+# Konfirmasi Visual
 async def show_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     form_data = context.user_data.get("form_data", {})
     kategori = form_data.get("kategori", "Visit Baru")
@@ -290,7 +286,7 @@ async def show_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ────────────── Simpan atau Batalkan ──────────────
+# Simpan atau Batalkan
 async def handle_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
