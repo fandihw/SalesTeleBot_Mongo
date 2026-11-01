@@ -12,7 +12,7 @@ user_collection = db[USER_COLLECTION_NAME]
 
 def save_data(user_data: dict):
     doc = user_data.copy()
-    doc["timestamp"] = datetime.now(timezone.utc)  # ✅ simpan sebagai UTC
+    doc["timestamp"] = datetime.now(timezone.utc) 
     collection.insert_one(doc)
 
 def get_last_30_days_data():
