@@ -10,16 +10,13 @@ from datetime import timezone, timedelta
 from html import escape
 import asyncio
 
-# Fungsi bantu untuk padding label
 def fmt(label, value):
     return f"{label:<22}: {escape(str(value) if value else '-')}"
 
-# Format pesan tiap entry
 def format_data(entry):
     wib_time = entry["timestamp"].astimezone(timezone(timedelta(hours=7)))
     time_str = wib_time.strftime("%d/%m/%Y %H:%M WIB")
 
-    # ✅ Gunakan field name yang konsisten dengan database
     return (
         "<pre>"
         "📌 Data Kunjungan Sales\n"
@@ -56,26 +53,26 @@ def format_data(entry):
 async def handle_cekdata(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    # ✅ Cek izin user
+    # Cek izin user
     if not is_user_allowed(user_id):
         await update.message.reply_text("❌ Anda tidak memiliki izin untuk melihat data ini")
         return
 
-    # ✅ Ambil role user
+    # Ambil role user
     user_role = get_user_role(user_id)
     if not user_role:
         await update.message.reply_text("❌ Role user tidak ditemukan")
         return
 
-    # ✅ Ambil data berdasarkan role
+    # Ambil data berdasarkan role
     if user_role == "superadmin":
-        entries = get_all_data_last_30_days()  # ✅ Semua data 30 hari terakhir
+        entries = get_all_data_last_30_days()  # Semua data 30 hari terakhir
         info_msg = "📊 Menampilkan SEMUA data kunjungan 30 hari terakhir (Superadmin)"
     else:  # role "sales"
         entries = get_user_data_last_30_days(str(user_id))
         info_msg = "📊 Menampilkan data kunjungan Anda dalam 30 hari terakhir"
 
-    # ✅ Cek apakah ada data
+    # Cek apakah ada data
     if not entries:
         if user_role == "superadmin":
             await update.message.reply_text("📭 Tidak ada data kunjungan dalam 30 hari terakhir")
@@ -83,10 +80,10 @@ async def handle_cekdata(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("📭 Tidak ada data kunjungan Anda dalam 30 hari terakhir")
         return
 
-    # ✅ Kirim info jumlah data
+    # Kirim info jumlah data
     await update.message.reply_text(f"{info_msg}\n\n📈 Total data: {len(entries)} entry")
 
-    # ✅ Batasi jumlah data yang ditampilkan untuk menghindari spam
+    # Batasi jumlah data yang ditampilkan untuk menghindari spam
     max_entries = 50 if user_role == "superadmin" else 30
     displayed_entries = entries[:max_entries]
 
@@ -95,28 +92,28 @@ async def handle_cekdata(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"⚠️ Terlalu banyak data! Menampilkan {max_entries} data terbaru dari {len(entries)} total data."
         )
 
-    # ✅ Kirim data dengan delay untuk menghindari rate limit
+    # Kirim data dengan delay untuk menghindari rate limit
     for i, entry in enumerate(displayed_entries, start=1):
         try:
             msg = format_data(entry)
             await update.message.reply_text(msg, parse_mode="HTML")
             
-            # ✅ Delay setiap 5 pesan untuk superadmin, 10 untuk sales
+            # Delay setiap 5 pesan untuk superadmin, 10 untuk sales
             delay_interval = 5 if user_role == "superadmin" else 10
             if i % delay_interval == 0:
                 await asyncio.sleep(1)
                 
         except Exception as e:
-            # ✅ Jika ada error parsing HTML, kirim sebagai text biasa
+            # Jika ada error parsing HTML, kirim sebagai text biasa
             await update.message.reply_text(f"❗ Error menampilkan data ke-{i}: {str(e)}")
             continue
 
-    # ✅ Pesan selesai
+    # Pesan selesai
     total_displayed = len(displayed_entries)
     if user_role == "superadmin" and len(entries) > max_entries:
         await update.message.reply_text(
-            f"✅ Selesai menampilkan {total_displayed} dari {len(entries)} data\n"
-            f"💡 Gunakan filter atau export untuk melihat semua data"
+            f"Selesai menampilkan {total_displayed} dari {len(entries)} data\n"
+            f"Gunakan filter atau export untuk melihat semua data"
         )
     else:
-        await update.message.reply_text(f"✅ Selesai menampilkan {total_displayed} data")
+        await update.message.reply_text(f"Selesai menampilkan {total_displayed} data")
